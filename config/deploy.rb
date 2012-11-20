@@ -15,6 +15,8 @@ ssh_options[:keys] = ["#{ENV['HOME']}/.ec2/capdriven-puppet.pem"] #unless 'devel
 
 #bootstrap from https://gist.github.com/3072375
 #modified to install puppet on the server
+
+desc 'Boostraps a server by installing puppet and applying puppet manifest'
 namespace :bootstrap do
   task :default do
     # Specific RVM string for managing Puppet; may or may not match the RVM string for the application
@@ -25,18 +27,23 @@ namespace :bootstrap do
 
     try_sudo("yum -y install puppet") #install puppet, -y assumes answer yes on all questions.
 
+    #inspiration here to run specific .pp file for the specific role: http://bentis.calepin.co/pulling-puppets-strings-with-capistrano.html
+
     # We tar up the puppet directory from the current directory -- the puppet directory within the source code repository
-    system("tar cczf 'puppet.tgz' puppet/")
+    system("tar cczf 'puppet.tgz' config/puppet/")
     upload("puppet.tgz","/home/#{user}",:via => :scp)
+    system("rm puppet.tgz") # clean up junk!
 
     # Untar the puppet directory, and place at /etc/puppet -- the default location for manifests/modules
     run("tar xzf puppet.tgz")
-    try_sudo("rm -rf /etc/puppet")
-    try_sudo("mv /home/#{user}/puppet/ /etc/puppet")
+    run("rm puppet.tgz")
 
-    # Bootstrap RVM/Puppet!
-    try_sudo("bash /etc/puppet/bootstrap.sh")
   end 
+
+  after "bootstrap", :roles=>[:web] do 
+  	# here we place code specific for configuring the web role using puppet
+  	try_sudo("puppet apply config/puppet/web.pp")
+  end
 end
 
 
