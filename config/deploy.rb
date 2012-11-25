@@ -3,8 +3,11 @@ set :repository,  "git@github.com:morkeleb/capdriven-puppet.git"
 
 set :scm, :git
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
+set :gateway, 'ec2-user@54.246.155.9'
 
-role :web, "ec2-176-34-161-163.eu-west-1.compute.amazonaws.com"                          # Your HTTP server, Apache/etc
+role :web, "10.0.1.162"                          # Your HTTP server, Apache/etc
+role :web, "10.0.1.168"                          # Your HTTP server, Apache/etc
+role :db, "10.0.0.171"                          # Your HTTP server, Apache/etc
 #role :app, "your app-server here"                          # This may be the same as your `Web` server
 #role :db,  "your primary db-server here", :primary => true # This is where Rails migrations will run
 #role :db,  "your slave db-server here"
